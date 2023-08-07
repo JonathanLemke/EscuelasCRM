@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+    mariadb_escuelascrm:
+        image: mariadb
+        container_name: escuelascrm-db
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: root_password_here
+            MYSQL_DATABASE: EscuelasCRM_DB
+            MYSQL_USER: escuelas
+            MYSQL_PASSWORD: escuelas
+        ports:
+            # Estoy usando el puerto 3308 para evitar conflictos con los puertos 3306 y 3307 que ya están en uso.
+            - "3308:3306"
+        volumes:
+            - escuelascrm-db-data:/var/lib/mysql
+
+volumes:
+    escuelascrm-db-data:

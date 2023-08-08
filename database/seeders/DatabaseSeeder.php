@@ -17,6 +17,12 @@ class DatabaseSeeder extends Seeder
         \App\Models\Student::factory(10)->create([
             'school_id' => 1
         ]);
+         \App\Models\User::factory()->create([
+             'name' => 'Admin',
+             'email' => 'admin@firmafy.com',
+             'password' => 'password',
+             'email_verified_at' => now(),
+         ]);
         // \App\Models\User::factory(10)->create();
 
         // \App\Models\User::factory()->create([

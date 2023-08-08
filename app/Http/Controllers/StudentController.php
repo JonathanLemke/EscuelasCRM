@@ -28,8 +28,16 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        $student = Student::create($request->all());
-        return redirect()->route('students.show', $student->id)->with()->flash('success', 'Estudiante creado con éxito.');
+        try {
+            $student = Student::create($request->all());
+            return redirect()->route('students.show', $student->id)->with()->flash('success', 'Estudiante creado con éxito.');
+        } catch (\Exception $e) {
+
+            Log::error($e->getFile() . ' ' . $e->getLine() . ' ' . $e->getMessage());
+            return redirect()->back()->with()->flash('error', 'Ha ocurrido un error.');
+
+        }
+
     }
 
     /**
@@ -55,9 +63,18 @@ class StudentController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $student = Student::findOrFail($id);
-        $student->update($request->all());
-        return redirect()->route('students.show', $student->id)->with()->flash('success', 'Estudiante actualizado con éxito.');
+        try {
+
+            $student = Student::findOrFail($id);
+            $student->update($request->all());
+            return redirect()->route('students.show', $student->id)->with()->flash('success', 'Estudiante actualizado con éxito.');
+
+        } catch (\Exception $e) {
+
+            Log::error($e->getFile() . ' ' . $e->getLine() . ' ' . $e->getMessage());
+            return redirect()->back()->with()->flash('error', 'Ha ocurrido un error.');
+
+        }
     }
 
     /**
@@ -65,8 +82,16 @@ class StudentController extends Controller
      */
     public function destroy(string $id)
     {
-        $student = Student::findOrFail($id);
-        $student->delete();
-        return redirect()->route('students.index')->with()->flash('success', 'Estudiante eliminado con éxito.');
+        try {
+
+            $student = Student::findOrFail($id);
+            $student->delete();
+            return redirect()->route('students.index')->with()->flash('success', 'Estudiante eliminado con éxito.');
+        } catch (\Exception $e) {
+
+            Log::error($e->getFile() . ' ' . $e->getLine() . ' ' . $e->getMessage());
+            return redirect()->back()->with()->flash('error', 'Ha ocurrido un error.');
+
+        }
     }
 }

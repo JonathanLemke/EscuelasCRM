@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\School;
+use Illuminate\Support\Facades\Log;
 
 class SchoolController extends Controller
 {
@@ -29,18 +30,28 @@ class SchoolController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->hasFile('logo')) {
-            $request->validate([
-                'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048|dimensions:min_width=200,min_height=200',
-            ]);
-            if ($request->file('logo')->isValid()) {
-                $path = $request->file('logo')->store('public/logos');
-                $request->merge(['logo' => $path]);
+        try {
+
+            if ($request->hasFile('logo')) {
+                $request->validate([
+                    'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048|dimensions:min_width=200,min_height=200',
+                ]);
+                if ($request->file('logo')->isValid()) {
+                    $path = $request->file('logo')->store('public/logos');
+                    $request->merge(['logo' => $path]);
+                }
             }
+
+            $school = School::create($request->all());
+            return redirect()->route('schools.show', $school->id)->with()->flash('success', 'Escuela creada con éxito.');
+
+        } catch (\Exception $e) {
+
+            Log::error($e->getFile() . ' ' . $e->getLine() . ' ' . $e->getMessage());
+            return redirect()->back()->with()->flash('error', 'Ha ocurrido un error.');
+
         }
 
-        $school = School::create($request->all());
-        return redirect()->route('schools.show', $school->id)->with()->flash('success', 'Escuela creada con éxito.');
     }
 
     /**
@@ -66,20 +77,27 @@ class SchoolController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        if ($request->hasFile('logo')) {
-            $request->validate([
-                'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048|dimensions:min_width=200,min_height=200',
-            ]);
+        try {
+            if ($request->hasFile('logo')) {
+                $request->validate([
+                    'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048|dimensions:min_width=200,min_height=200',
+                ]);
 
-            if ($request->file('logo')->isValid()) {
-                $path = $request->file('logo')->store('public/logos');
-                $request->merge(['logo' => $path]);
+                if ($request->file('logo')->isValid()) {
+                    $path = $request->file('logo')->store('public/logos');
+                    $request->merge(['logo' => $path]);
+                }
             }
-        }
 
-        $school = School::findOrFail($id);
-        $school->update($request->all());
-        return redirect()->route('schools.show', $school->id)->with()->flash('success', 'Escuela actualizada con éxito.');
+            $school = School::findOrFail($id);
+            $school->update($request->all());
+            return redirect()->route('schools.show', $school->id)->with()->flash('success', 'Escuela actualizada con éxito.');
+        } catch (\Exception $e) {
+
+            Log::error($e->getFile() . ' ' . $e->getLine() . ' ' . $e->getMessage());
+            return redirect()->back()->with()->flash('error', 'Ha ocurrido un error.');
+
+        }
     }
 
     /**
@@ -87,8 +105,18 @@ class SchoolController extends Controller
      */
     public function destroy(string $id)
     {
-        $school = School::findOrFail($id);
-        $school->delete();
-        return redirect()->route('schools.index')->with()->flash('success', 'Escuela eliminada con éxito.');
+        try {
+
+            $school = School::findOrFail($id);
+            $school->delete();
+            return redirect()->route('schools.index')->with()->flash('success', 'Escuela eliminada con éxito.');
+
+        } catch (\Exception $e) {
+
+            Log::error($e->getFile() . ' ' . $e->getLine() . ' ' . $e->getMessage());
+            return redirect()->back()->with()->flash('error', 'Ha ocurrido un error.');
+
+        }
+
     }
 }

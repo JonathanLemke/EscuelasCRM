@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\School;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class SchoolFactory extends Factory
 {
 
-    protected $model = Escola::class;
+    protected $model = School::class;
     /**
      * Define the model's default state.
      *

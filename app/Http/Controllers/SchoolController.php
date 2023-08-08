@@ -38,7 +38,8 @@ class SchoolController extends Controller
      */
     public function show(string $id)
     {
-        return view('schools.show', compact('id'));
+        $school = School::findOrFail($id);
+        return view('schools.show', compact('school'));
     }
 
     /**
@@ -46,7 +47,8 @@ class SchoolController extends Controller
      */
     public function edit(string $id)
     {
-        return view('schools.edit', compact('id'));
+        $school = School::findOrFail($id);
+        return view('schools.edit', compact('school'));
     }
 
     /**

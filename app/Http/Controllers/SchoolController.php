@@ -31,7 +31,7 @@ class SchoolController extends Controller
     {
         if ($request->hasFile('logo')) {
             $request->validate([
-                'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048|dimensions:min_width=200,min_height=200',
             ]);
             if ($request->file('logo')->isValid()) {
                 $path = $request->file('logo')->store('public/logos');
@@ -68,8 +68,9 @@ class SchoolController extends Controller
     {
         if ($request->hasFile('logo')) {
             $request->validate([
-                'logo' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048|dimensions:min_width=200,min_height=200',
             ]);
+
             if ($request->file('logo')->isValid()) {
                 $path = $request->file('logo')->store('public/logos');
                 $request->merge(['logo' => $path]);

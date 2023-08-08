@@ -29,6 +29,16 @@ class SchoolController extends Controller
      */
     public function store(Request $request)
     {
+        if ($request->hasFile('logo')) {
+            $request->validate([
+                'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            ]);
+            if ($request->file('logo')->isValid()) {
+                $path = $request->file('logo')->store('public/logos');
+                $request->merge(['logo' => $path]);
+            }
+        }
+
         $school = School::create($request->all());
         return redirect()->route('schools.show', $school->id)->with()->flash('success', 'Escuela creada con éxito.');
     }
@@ -56,6 +66,16 @@ class SchoolController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        if ($request->hasFile('logo')) {
+            $request->validate([
+                'logo' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            ]);
+            if ($request->file('logo')->isValid()) {
+                $path = $request->file('logo')->store('public/logos');
+                $request->merge(['logo' => $path]);
+            }
+        }
+
         $school = School::findOrFail($id);
         $school->update($request->all());
         return redirect()->route('schools.show', $school->id)->with()->flash('success', 'Escuela actualizada con éxito.');

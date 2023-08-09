@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\School;
+use App\Models\Student;
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
@@ -11,8 +13,15 @@ class StudentController extends Controller
      */
     public function index()
     {
-        $students = Student::paginate(10);
-        return view('students.index', compact('students'));
+        $schools = School::all();
+        // verify filter school of students and paginate
+        if (request()->get('escuela'))
+            $students = Student::where('school_id', request()->get('escuela'))
+                ->paginate(10);
+        else
+            $students = Student::paginate(10);
+
+        return view('students.index', compact('students', 'schools'));
     }
 
     /**
@@ -20,7 +29,9 @@ class StudentController extends Controller
      */
     public function create()
     {
-        return view('students.create');
+        // get all schools
+        $schools = School::all();
+        return view('students.form', compact('schools'));
     }
 
     /**
@@ -30,11 +41,13 @@ class StudentController extends Controller
     {
         try {
             $student = Student::create($request->all());
-            return redirect()->route('students.show', $student->id)->with()->flash('success', 'Estudiante creado con éxito.');
+            $request->session()->flash('success', 'Estudiante creado con éxito.');
+            return redirect()->route('students.show', $student->id);
         } catch (\Exception $e) {
 
             Log::error($e->getFile() . ' ' . $e->getLine() . ' ' . $e->getMessage());
-            return redirect()->back()->with()->flash('error', 'Ha ocurrido un error.');
+            $request->session()->flash('error', 'Ha ocurrido un error.');
+            return redirect()->back();
 
         }
 
@@ -55,7 +68,8 @@ class StudentController extends Controller
     public function edit(string $id)
     {
         $student = Student::findOrFail($id);
-        return view('students.edit', compact('student'));
+        $schools = School::all();
+        return view('students.form', compact('student', 'schools'));
     }
 
     /**
@@ -67,12 +81,14 @@ class StudentController extends Controller
 
             $student = Student::findOrFail($id);
             $student->update($request->all());
-            return redirect()->route('students.show', $student->id)->with()->flash('success', 'Estudiante actualizado con éxito.');
+            $request->session()->flash('success', 'Estudiante actualizado con éxito.');
+            return redirect()->route('students.show', $student->id);
 
         } catch (\Exception $e) {
 
             Log::error($e->getFile() . ' ' . $e->getLine() . ' ' . $e->getMessage());
-            return redirect()->back()->with()->flash('error', 'Ha ocurrido un error.');
+            $request->session()->flash('error', 'Ha ocurrido un error.');
+            return redirect()->back();
 
         }
     }
@@ -80,17 +96,20 @@ class StudentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
         try {
 
             $student = Student::findOrFail($id);
             $student->delete();
-            return redirect()->route('students.index')->with()->flash('success', 'Estudiante eliminado con éxito.');
+            $request->session()->flash('success', 'Estudiante eliminado con éxito.');
+            return redirect()->route('students.index');
+
         } catch (\Exception $e) {
 
             Log::error($e->getFile() . ' ' . $e->getLine() . ' ' . $e->getMessage());
-            return redirect()->back()->with()->flash('error', 'Ha ocurrido un error.');
+            $request->session()->flash('error', 'Ha ocurrido un error.');
+            return redirect()->back();
 
         }
     }

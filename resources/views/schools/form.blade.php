@@ -32,7 +32,7 @@
             <div class="form-group">
                 <label for="logo">Logotipo</label>
 
-                @if (isset($schools) and $schools->logo)
+                @if (Storage::disk('public')->exists('logos/' . basename($schools->logo)))
                     <br><br>
                     <a href="{{ $schools->logo }}" target="_blank"><img src="{{ asset($schools->logo) }}" alt="{{ $schools->name }}" width="100"></a>
                 @else

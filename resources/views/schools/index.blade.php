@@ -38,7 +38,7 @@
                     <td>
                         @if ($school->logo
                             and Storage::disk('public')->exists('logos/' . basename($school->logo)))
-                            <a href="storage/{{ $school->logo }}" target="_blank">
+                            <a href="{{ $school->logo }}" target="_blank">
                                 <img src="{{ asset($school->logo) }}" alt="{{ $school->name }}" width="50">
                             </a>
                         @else

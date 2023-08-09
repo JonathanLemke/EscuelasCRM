@@ -24,7 +24,7 @@
         </div>
         <div class="form-group">
             <label for="logo">Logotipo</label><br>
-            @if ($school->logo) <a href="{{ $school->logo }}" target="_blank"><img src="{{ asset($school->logo) }}" alt="{{ $school->name }}" width="100"></a> @else <a href="{{ asset('storage/default_logo.jpeg') }}" target="_blank"><img src="{{ asset('storage/default_logo.jpeg') }}" alt="{{ $school->name }}" width="100"></a>@endif
+            @if (Storage::disk('public')->exists('logos/' . basename($school->logo))) <a href="{{ $school->logo }}" target="_blank"><img src="{{ asset($school->logo) }}" alt="{{ $school->name }}" width="100"></a> @else <a href="{{ asset('storage/default_logo.jpeg') }}" target="_blank"><img src="{{ asset('storage/default_logo.jpeg') }}" alt="{{ $school->name }}" width="100"></a>@endif
         </div>
         <div class="form-group">
             <label for="email">Correo electrónico</label>

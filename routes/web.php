@@ -26,3 +26,6 @@ Route::get('/schools', [App\Http\Controllers\SchoolController::class, 'index'])-
 Route::get('/schools/create', [App\Http\Controllers\SchoolController::class, 'create'])->name('schools.create');
 Route::post('/schools', [App\Http\Controllers\SchoolController::class, 'store'])->name('schools.store');
 Route::get('/schools/{school}', [App\Http\Controllers\SchoolController::class, 'show'])->name('schools.show');
+Route::get('/schools/{school}/edit', [App\Http\Controllers\SchoolController::class, 'edit'])->name('schools.edit');
+Route::put('/schools/{school}', [App\Http\Controllers\SchoolController::class, 'update'])->name('schools.update');
+Route::delete('/schools/{school}', [App\Http\Controllers\SchoolController::class, 'destroy'])->name('schools.destroy');

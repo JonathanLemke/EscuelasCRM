@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\School;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class SchoolController extends Controller
 {
@@ -22,7 +23,7 @@ class SchoolController extends Controller
      */
     public function create()
     {
-        return view('schools.create');
+        return view('schools.form');
     }
 
     /**
@@ -37,18 +38,28 @@ class SchoolController extends Controller
                     'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048|dimensions:min_width=200,min_height=200',
                 ]);
                 if ($request->file('logo')->isValid()) {
-                    $path = $request->file('logo')->store('public/logos');
-                    $request->merge(['logo' => $path]);
+                    $path = Storage::url($request->file('logo')->store('public/logos'));
                 }
             }
 
-            $school = School::create($request->all());
-            return redirect()->route('schools.show', $school->id)->with()->flash('success', 'Escuela creada con éxito.');
+            $school = School::create([
+                'name' => $request->name,
+                'address' => $request->address,
+                'logo' => $path,
+                'email' => $request->email,
+                'phone_number' => $request->phone_number,
+                'web_page' => $request->web_page
+            ]);
+
+            $request->session()->flash('success', 'Escuela creada con éxito.');
+            return redirect()->route('schools.show', $school->id);
+
 
         } catch (\Exception $e) {
 
             Log::error($e->getFile() . ' ' . $e->getLine() . ' ' . $e->getMessage());
-            return redirect()->back()->with()->flash('error', 'Ha ocurrido un error.');
+            $request->session()->flash('error', 'Ha ocurrido un error.');
+            return redirect()->back();
 
         }
 
@@ -68,8 +79,8 @@ class SchoolController extends Controller
      */
     public function edit(string $id)
     {
-        $school = School::findOrFail($id);
-        return view('schools.edit', compact('school'));
+        $schools = School::findOrFail($id);
+        return view('schools.form', compact('schools'));
     }
 
     /**
@@ -78,24 +89,39 @@ class SchoolController extends Controller
     public function update(Request $request, string $id)
     {
         try {
+
             if ($request->hasFile('logo')) {
                 $request->validate([
                     'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048|dimensions:min_width=200,min_height=200',
                 ]);
 
                 if ($request->file('logo')->isValid()) {
-                    $path = $request->file('logo')->store('public/logos');
-                    $request->merge(['logo' => $path]);
+                    $path = Storage::url($request->file('logo')->store('public/logos'));
+                    $request->logo = $path;
+
                 }
             }
 
             $school = School::findOrFail($id);
-            $school->update($request->all());
-            return redirect()->route('schools.show', $school->id)->with()->flash('success', 'Escuela actualizada con éxito.');
+            $school->update([
+                'name' => $request->name,
+                'address' => $request->address,
+                'logo' => $request->logo,
+                'email' => $request->email,
+                'phone_number' => $request->phone_number,
+                'web_page' => $request->web_page
+            ]);
+
+
+            $request->session()->flash('success', 'Escuela actualizada con éxito.');
+            return redirect()->route('schools.show', $school->id);
+
         } catch (\Exception $e) {
 
             Log::error($e->getFile() . ' ' . $e->getLine() . ' ' . $e->getMessage());
-            return redirect()->back()->with()->flash('error', 'Ha ocurrido un error.');
+
+            $request->session()->flash('error', 'Ha ocurrido un error.');
+            return redirect()->back();
 
         }
     }
@@ -103,18 +129,25 @@ class SchoolController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request,string $id)
     {
         try {
 
             $school = School::findOrFail($id);
             $school->delete();
-            return redirect()->route('schools.index')->with()->flash('success', 'Escuela eliminada con éxito.');
+            $request->session()->flash('success', 'Escuela eliminada con éxito.');
+            return redirect()->route('schools.index');
 
         } catch (\Exception $e) {
 
             Log::error($e->getFile() . ' ' . $e->getLine() . ' ' . $e->getMessage());
-            return redirect()->back()->with()->flash('error', 'Ha ocurrido un error.');
+
+            $request->session()->flash('error', 'Ha ocurrido un error.');
+
+            if ($e->getCode() == 23000)
+                $request->session()->flash('error', 'No se puede eliminar la escuela porque tiene alumnos asignados. Por favor elimine los alumnos antes de eliminar la escuela.');
+
+            return redirect()->back();
 
         }
 

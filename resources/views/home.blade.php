@@ -16,11 +16,6 @@
 
                     {{ __('You are logged in!') }}
 
-                    <!-- two columns cards -->
-                    <!-- the cards have a image to represent the area -->
-                    <!-- the cards have a title -->
-                    <!-- the cards have a description -->
-                    <!-- the cards link to route list of especific area -->
                     <div class="row justify-content-center">
                         <div class="col-md-4">
                             <div class="card">
